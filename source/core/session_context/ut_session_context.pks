@@ -40,6 +40,17 @@ create or replace package ut_session_context as
   * Returns utPLSQL session context namespace name
   */
   function get_namespace return varchar2;
+  
+  /*
+   * Returns true if current DB Session is attached to a RAS session
+   */
+  function is_RAS_session return boolean;
+   
+  function list_attributes return ut_varchar2_list;
+
+  $if dbms_db_version.version >= 12 $then
+    function context_to_namespace return dbms_xs_nsattrlist;
+  $end
 
 end;
 /

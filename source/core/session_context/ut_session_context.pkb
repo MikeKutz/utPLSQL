@@ -44,5 +44,63 @@ create or replace package body ut_session_context as
     return gc_context_name;
   end;
 
+  function is_RAS_session return boolean
+  as
+    l_sessionid  varchar2(64);
+  begin
+    -- does this compile on SE ??
+    $if dbms_db_version.version >= 12 $then
+      -- RAS check
+      select xs_sys_context( 'xs$session', 'session_id' )
+        into l_sessionid
+      from dual;
+    $end
+    
+    return case when l_sessionid is not null then true else false end;
+  end;
+
+  function list_attributes return ut_varchar2_list
+  as
+    l_return_value  ut_varchar2_list;
+  begin
+    l_return_value.extend(15);
+    
+    l_return_value( 1 )  := 'CONVERAGE_RUN_ID';
+    l_return_value( 2 )  := 'RUN_PATHS';
+    l_return_value( 3 )  := 'SUITE_DESCRIPTION';
+    l_return_value( 4 )  := 'SUITE_PACKAGE';
+    l_return_value( 5 )  := 'SUITE_PATH';
+    l_return_value( 6 )  := 'SUITE_START_TIME';
+    l_return_value( 7 )  := 'CURRENT_EXECUTABLE_NAME';
+    l_return_value( 8 )  := 'CURRNT_EXECUTABLE_TYPE';
+    l_return_value( 9 )  := 'CONTEXT_DESCRIPTION';
+    l_return_value( 10 ) := 'CONTEXT_NAME';
+    l_return_value( 11 ) := 'CONTEXT_PATH';
+    l_return_value( 12 ) := 'CONTEXT_START_TIME';
+    l_return_value( 13 ) := 'TEST_DESCRIPTION';
+    l_return_value( 14 ) := 'TEST_NAME';
+    l_return_value( 15 ) := 'TEST_START_TIME';
+  
+    return l_return_value;
+  end;
+
+  $if dbms_db_version.version >= 12 $then
+    function context_to_namespace return dbms_xs_nsattrlist
+    as
+      l_attrib_list   ut_varchar2_list;
+      l_return_value  dbms_xs_nsattrlist := new dbms_xs_nsattrlist();
+    begin
+      l_attrib_list := list_attributes();
+      
+      l_return_value.extend( l_attrib_list.count );
+      
+      for i in 1 .. l_attrib_list.count
+      loop
+        l_return_value(i) := new dbms_xs_nsattr( ut_session_context.get_namespace(), l_attrib_list(i), sys_context( ut_session_context.get_namespace(), l_attrib_list(i) ) );
+      end loop;
+      
+      return l_return_value;
+    end;
+  $end
 end;
 /
