@@ -61,7 +61,7 @@ create or replace package body ut_session_context as
 
   function list_attributes return ut_varchar2_list
   as
-    l_return_value  ut_varchar2_list;
+    l_return_value  ut_varchar2_list := new ut_varchar2_list();
   begin
     l_return_value.extend(15);
     
@@ -84,23 +84,21 @@ create or replace package body ut_session_context as
     return l_return_value;
   end;
 
-  $if dbms_db_version.version >= 12 $then
-    function context_to_namespace return dbms_xs_nsattrlist
-    as
-      l_attrib_list   ut_varchar2_list;
-      l_return_value  dbms_xs_nsattrlist := new dbms_xs_nsattrlist();
-    begin
-      l_attrib_list := list_attributes();
-      
-      l_return_value.extend( l_attrib_list.count );
-      
-      for i in 1 .. l_attrib_list.count
-      loop
-        l_return_value(i) := new dbms_xs_nsattr( ut_session_context.get_namespace(), l_attrib_list(i), sys_context( ut_session_context.get_namespace(), l_attrib_list(i) ) );
-      end loop;
-      
-      return l_return_value;
-    end;
-  $end
+  function context_to_namespace return ut_ns_attrib_list
+  as
+    l_attrib_list   ut_varchar2_list;
+    l_return_value  ut_ns_attrib_list := new ut_ns_attrib_list();
+  begin
+    l_attrib_list := list_attributes();
+    
+    l_return_value.extend( l_attrib_list.count );
+    
+    for i in 1 .. l_attrib_list.count
+    loop
+      l_return_value(i) := new ut_ns_attrib( ut_session_context.get_namespace(), l_attrib_list(i), sys_context( ut_session_context.get_namespace(), l_attrib_list(i) ) );
+    end loop;
+    
+    return l_return_value;
+  end;
 end;
 /

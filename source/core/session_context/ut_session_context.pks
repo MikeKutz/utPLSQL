@@ -41,16 +41,16 @@ create or replace package ut_session_context as
   */
   function get_namespace return varchar2;
   
+  /* list of all attributes used */
+  function list_attributes return ut_varchar2_list;
+  
   /*
    * Returns true if current DB Session is attached to a RAS session
    */
-  function is_RAS_session return boolean;
+--  function is_RAS_session return boolean;
    
-  function list_attributes return ut_varchar2_list;
 
-  $if dbms_db_version.version >= 12 $then
-    function context_to_namespace return dbms_xs_nsattrlist;
-  $end
+--  function context_to_namespace return ut_ns_attrib_list;
 
 end;
 /
