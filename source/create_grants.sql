@@ -141,3 +141,7 @@ grant select  on &&ut3_owner..ut_coverage_runs   to &ut3_user;
 grant execute on &&ut3_owner..ut_matcher_options to &ut3_user;
 grant execute on &&ut3_owner..ut_matcher_options_items to &ut3_user;
 
+--RAS grants
+grant execute on &&ut3_owner..ut_ras_events to &ut3_user;
+
+

@@ -135,3 +135,6 @@ create &action_type. synonym &ut3_user.ut_output_reporter_base for &&ut3_owner..
 create &action_type. synonym &ut3_user.dbmspcc_blocks for &&ut3_owner..dbmspcc_blocks;
 create &action_type. synonym &ut3_user.dbmspcc_runs for &&ut3_owner..dbmspcc_runs;
 create &action_type. synonym &ut3_user.dbmspcc_units for &&ut3_owner..dbmspcc_units;
+
+--RAS synonyms
+create &action_type. synonym &ut3_user.dbmspcc_units for &&ut3_owner..ut_ras_events;
