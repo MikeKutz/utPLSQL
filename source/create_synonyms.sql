@@ -137,4 +137,11 @@ create &action_type. synonym &ut3_user.dbmspcc_runs for &&ut3_owner..dbmspcc_run
 create &action_type. synonym &ut3_user.dbmspcc_units for &&ut3_owner..dbmspcc_units;
 
 --RAS synonyms
-create &action_type. synonym &ut3_user.dbmspcc_units for &&ut3_owner..ut_ras_events;
+create &action_type. synonym &ut3_user.ut_ras for &&ut3_owner..ut_ras;
+create &action_type. synonym &ut3_user.ut_ras_utils for &&ut3_owner..ut_ras_utils;
+create &action_type. synonym &ut3_user.ut_ras_session_hash for &&ut3_owner..ut_ras_session_hash;
+create &action_type. synonym &ut3_user.ut_ras_session_info for &&ut3_owner..ut_ras_session_info;
+create &action_type. synonym &ut3_user.ut_ns_attrib_list for &&ut3_owner..ut_ns_attrib_list;
+create &action_type. synonym &ut3_user.ut_ns_attrib for &&ut3_owner..ut_ns_attrib;
+create &action_type. synonym &ut3_user.ut_principal_list for &&ut3_owner..ut_principal_list;
+create &action_type. synonym &ut3_user.ut_principal for &&ut3_owner..ut_principal;

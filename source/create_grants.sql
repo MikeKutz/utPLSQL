@@ -142,6 +142,13 @@ grant execute on &&ut3_owner..ut_matcher_options to &ut3_user;
 grant execute on &&ut3_owner..ut_matcher_options_items to &ut3_user;
 
 --RAS grants
-grant execute on &&ut3_owner..ut_ras_events to &ut3_user;
+grant execute on &&ut3_owner..ut_ras to &ut3_user;
+grant execute on &&ut3_owner..ut_ras_utils to &ut3_user;
+grant execute on &&ut3_owner..ut_ras_session_hash to &ut3_user;
+grant execute on &&ut3_owner..ut_ras_session_info to &ut3_user;
+grant execute on &&ut3_owner..ut_ns_attrib_list to &ut3_user;
+grant execute on &&ut3_owner..ut_ns_attrib to &ut3_user;
+grant execute on &&ut3_owner..ut_principal_list to &ut3_user;
+grant execute on &&ut3_owner..ut_principal to &ut3_user;
 
 

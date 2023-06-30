@@ -395,8 +395,6 @@ drop type ut_have_count;
 
 drop type ut_compound_data_value;
 
-drop type ut_ras_events;
-
 set echo off
 set feedback off
 declare

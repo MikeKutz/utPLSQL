@@ -323,6 +323,22 @@ prompt Installing DBMSPLSQL Tables objects into &&ut3_owner schema
 @@install_component.sql 'reporters/ut_documentation_reporter.tps'
 @@install_component.sql 'reporters/ut_documentation_reporter.tpb'
 
+--RAS object
+@@install_component.sql 'RAS/ut_principal.tps'
+@@install_component.sql 'RAS/ut_principal.tpb'
+@@install_component.sql 'RAS/ut_principal_list.tps'
+@@install_component.sql 'RAS/ut_ns_attrib.tps'
+@@install_component.sql 'RAS/ut_ns_attrib.tpb'
+@@install_component.sql 'RAS/ut_ns_attrib_list.tps'
+@@install_component.sql 'RAS/ut_ras_session_info.tps'
+@@install_component.sql 'RAS/ut_ras_session_hash.tps'
+@@install_component.sql 'RAS/ut_ras_session_hash.tpb'
+@@install_component.sql 'RAS/ut_ras_utils.pks'
+@@install_component.sql 'RAS/ut_ras_utils.pkb'
+@@install_component.sql 'RAS/ut_ras.tps'
+@@install_component.sql 'RAS/ut_ras.tpb'
+
+
 --plugin interface API for running utPLSQL
 @@install_component.sql 'api/ut_runner.pks'
 @@install_component.sql 'api/ut_runner.pkb'

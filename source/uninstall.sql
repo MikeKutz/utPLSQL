@@ -28,6 +28,8 @@ alter session set current_schema = &&ut3_owner;
 
 @@uninstall_objects.sql
 
+@@ras/uninstall.sql
+
 @@uninstall_synonyms.sql
 
 begin
