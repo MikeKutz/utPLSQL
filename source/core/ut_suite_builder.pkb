@@ -39,11 +39,11 @@ create or replace package body ut_suite_builder is
   gc_name                        constant t_annotation_name := 'name';
   gc_endcontext                  constant t_annotation_name := 'endcontext';
   -- RAS Annotations
-  gc_ras_user                    constant t_annotation_name := 'rasuser';
-  gc_ras_ext_user                constant t_annotation_name := 'rasextuser';
-  gc_ras_role                    constant t_annotation_name := 'rasrole';
-  gc_ras_ext_role                constant t_annotation_name := 'rasextrole';
-  gc_ras_ns_attrib               constant t_annotation_name := 'rasnsattrib';
+  gc_ras_user                    constant t_annotation_name := 'xsuser';
+  gc_ras_ext_user                constant t_annotation_name := 'xsextuser';
+  gc_ras_role                    constant t_annotation_name := 'xsrole';
+  gc_ras_ext_role                constant t_annotation_name := 'xsextrole';
+  gc_ras_ns_attrib               constant t_annotation_name := 'xsnsattrib';
 
   type tt_annotations is table of t_annotation_name;
 
@@ -432,14 +432,30 @@ create or replace package body ut_suite_builder is
 
     -- process RAS User tag ( ut_suite_item needs ras_user attribute)
     <<ras_tags>>
+    declare
+      l_ras_user_list ut_varchar2_list := new ut_varchar2_list();
+      l_ras_principal ut_principal;
+      l_ras_user   varchar2(100);
+      l_ras_pos    pls_integer;
+      l_ras_tt    tt_annotation_texts;
     begin
       -- User
       warning_on_duplicate_annot( a_suite, l_proc_annotations, gc_ras_user, a_procedure_name);
       warning_bad_annot_combination(
-          a_suite, a_procedure_name, l_proc_annotations, gc_test,
-          ut_varchar2_list(gc_ras_user, gc_ras_ext_user)
+          a_suite, a_procedure_name, l_proc_annotations, gc_ras_user,
+          ut_varchar2_list( gc_ras_ext_user )
       );
    
+      if l_proc_annotations.exists( gc_ras_user )
+      then
+        l_ras_tt  :=  l_proc_annotations( gc_ras_user );
+        l_ras_pos := l_ras_tt.first;
+        l_ras_user := 'harley';
+        l_ras_user := ut_utils.string_to_table(l_ras_tt(l_ras_pos), ',')(1);
+        l_ras_principal := new ut_principal( l_ras_user );
+
+        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, null, null, null, null, 0);
+      end if;
     end;
 
     a_suite_items.extend;

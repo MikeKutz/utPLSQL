@@ -8,72 +8,43 @@ as
     return;
   end;
   
-  member procedure ad_hoc_attach_session( a_session_info   in out ut_ras_session_info )
+  member procedure ad_hoc_attach_session( self in out nocopy ut_ras,  a_session_info   in out ut_ras_session_info )
   as
-    l_session       ut_ras_session_info;
-    l_ns_attriblist dbms_xs_nsattrlist := new dbms_xs_nsattrlist();
-    l_at            ut_ns_attrib_list;
-    l_n             int;
-    l_sessionid     raw(32);
-  begin
-    -- check input is valid
-    if a_session_info.disabled = 1
-      or a_session_info.principal is null
-    then
-      return;
-    end if;
-
-    -- copy basic info    
-    l_session.principal := a_session_info.principal;
-    l_session.sessionid := a_session_info.sessionid;
-    l_session.disabled  := 0;
-
-    -- copy over CONTEXT attributes
-    l_session.ns_attrib_list := ut_ras_utils.get_context_values();
-
-    -- copy over parameter attributes
-    if a_session_info.ns_attrib_list is not null
-    then
-      l_n := l_session.ns_attrib_list.count;
-      l_session.ns_attrib_list.extend(a_session_info.ns_attrib_list.count);
-      
-      for i in 1 .. a_session_info.ns_attrib_list.count
-      loop
-        l_session.ns_attrib_list( l_n + i ) := a_session_info.ns_attrib_list(i);
-      end loop;
-    end if;
-    -- build enable minus disable
-    -- build external muinus disable
-    -- build disable
+    l_adjusted_session  ut_ras_session_info;
     
-    -- lookup session id
-    -- get_or_make_session()
-    <<create_session>>
-    declare
-      no_session exception;
-      l_ns_attriblist dbms_xs_nsattrlist := new dbms_xs_nsattrlist();
-    begin
-      if ras_sessions.user_exists( l_session.principal.to_string() )
-      then
-        l_session.sessionid := ras_sessions.get_sessionid( l_session.principal.to_string() );
-        if l_session.sessionid is null
-        then
-          raise no_session;
-        end if;
-      else
-        raise no_session;
-      end if;
-    exception
-      when no_session then
-        dbms_xs_sessions.create_session( username    => l_session.principal.principal_name
-                                       , sessionid   => l_session.sessionid
-                                       , is_external => case when l_session.principal.is_external = 1 then true else false end
-                                       , namespaces  => ut_ras_utils.ut_attrib_to_xs_attrib( l_session.ns_attrib_list ) );
-        ras_sessions.set_user( l_session.principal.to_string(), l_sessionid );
-    end;
+    l_ns_attribs  ut_ns_attrib_list;
+    l_n int;
+  begin
+    if a_session_info is null then return; end if;
+    
+    self.get_or_create_session( a_session_info );
 
-    -- attach to session
-    ut_ras_utils.ad_hoc_attach( a_session_info );
+    l_adjusted_session := a_session_info;
+    if l_adjusted_session.ns_attrib_list is null
+    then
+      l_adjusted_session.ns_attrib_list := new ut_ns_attrib_list();
+    end if;
+    
+    -- copy over CONTEXT attributes
+    <<utils_cp_context>>
+    begin
+      l_ns_attribs := ut_ras_utils.get_context_values();
+
+      -- copy over parameter attributes
+      l_n := l_ns_attribs.first;
+      while( l_n is not null )
+      loop
+        l_adjusted_session.ns_attrib_list.extend();
+        l_adjusted_session.ns_attrib_list( l_adjusted_session.ns_attrib_list.last ) := l_ns_attribs( l_n );
+        
+        l_n := l_ns_attribs.next( l_n );
+      end loop;
+    end;
+    
+    -- l.enable_roles := principal_minus_principal( a.enabled_roles, a.disabled_roles );
+    -- l.external_roles := principal_minus_principal( a.external_roles, a.disabled_roles );
+
+    ut_ras_utils.ad_hoc_attach( l_adjusted_session );
   end;
 
   member procedure attach_session( user_name             in ut_principal
@@ -160,7 +131,7 @@ as
     ut_ras_utils.detach_session( a_abort );
   end;
   
-  member procedure destroy_all_sessions
+  member procedure destroy_all_sessions( self in out nocopy ut_ras )
   as
     l_users      ut_principal_list := new ut_principal_list();
     l_sessionid  raw(32);
@@ -175,7 +146,37 @@ as
         dbms_xs_sessions.destroy_session( l_sessionid );
       end if;
     end loop;
+    self.ras_sessions := new ut_ras_session_hash();
   end;
+
+  member procedure get_or_create_session( self in out nocopy ut_ras, a_session_info in out nocopy ut_ras_session_info )
+  as
+    no_session       exception;
+    l_ns_attriblist  dbms_xs_nsattrlist;
+  begin
+    if a_session_info is null then return; end if;
+    if a_session_info.principal.principal_name is null then return; end if;
+    
+    if self.ras_sessions.user_exists( a_session_info.principal.to_string() )
+    then
+      a_session_info.sessionid := self.ras_sessions.get_sessionid( a_session_info.principal.to_string() );
+      dbms_output.put_line( 'RAS SESSION : I ALREADY GOT ONE!!!' );
+      if a_session_info.sessionid is null
+      then
+        raise no_session;
+      end if;
+    else
+      raise no_session;
+    end if;
+  exception
+    when no_session then
+      dbms_xs_sessions.create_session( username    => a_session_info.principal.principal_name
+                                     , sessionid   => a_session_info.sessionid
+                                     , is_external => case when a_session_info.principal.is_external = 1 then true else false end
+                                     , namespaces  => l_ns_attriblist );
+      ras_sessions.set_user( a_session_info.principal.to_string(), a_session_info.sessionid );
+  end;
+
 end;
 /
 

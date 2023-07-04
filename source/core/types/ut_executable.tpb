@@ -127,6 +127,8 @@ create or replace type body ut_executable is
       'end;';
 
       ut_utils.debug_log('ut_executable.do_execute l_statement: ' || l_statement);
+      
+      ut_xs_session_manager.attach_session( self.ras_session );
 
       l_cursor_number := dbms_sql.open_cursor;
 
@@ -143,15 +145,18 @@ create or replace type body ut_executable is
         dbms_sql.variable_value(l_cursor_number, 'a_error_stack', self.error_stack);
         dbms_sql.variable_value(l_cursor_number, 'a_error_backtrace', self.error_backtrace);
         dbms_sql.close_cursor(l_cursor_number);
-      exception 
+        ut_xs_session_manager.detach_session;
+    exception 
         when ut_utils.ex_invalid_package then
           l_failed_with_invalid_pck := is_invalid();
           dbms_sql.close_cursor(l_cursor_number);
+          ut_xs_session_manager.detach_session(true);
           if not l_failed_with_invalid_pck then 
             raise;
           end if;
         when others then
          dbms_sql.close_cursor(l_cursor_number);
+         ut_xs_session_manager.detach_session(true);
          raise;
       end;
       

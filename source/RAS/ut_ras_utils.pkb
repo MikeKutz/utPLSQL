@@ -26,6 +26,8 @@ as
       return;
     end if;
     
+    dbms_output.put_line( 'RAS SESSION ----' || a_session.sessionid );
+    
     dbms_xs_sessions.attach_session( a_session.sessionid
                                     ,namespaces => ut_ras_utils.ut_attrib_to_xs_attrib( a_session.ns_attrib_list ) );
   end;
