@@ -145,3 +145,4 @@ create &action_type. synonym &ut3_user.ut_ns_attrib_list for &&ut3_owner..ut_ns_
 create &action_type. synonym &ut3_user.ut_ns_attrib for &&ut3_owner..ut_ns_attrib;
 create &action_type. synonym &ut3_user.ut_principal_list for &&ut3_owner..ut_principal_list;
 create &action_type. synonym &ut3_user.ut_principal for &&ut3_owner..ut_principal;
+create &action_type. synonym &ut3_user.ut_xs_session_manager for &&ut3_owner..ut_xs_session_manager;

@@ -70,6 +70,16 @@ create or replace context &&ut3_owner._info using &&ut3_owner..ut_session_contex
 @@install_component.sql 'core/events/ut_event_manager.pks'
 @@install_component.sql 'core/events/ut_event_manager.pkb'
 
+-- RAS Objects (specs)
+@@install_component.sql 'RAS/ut_principal.tps'
+@@install_component.sql 'RAS/ut_principal_list.tps'
+@@install_component.sql 'RAS/ut_ns_attrib.tps'
+@@install_component.sql 'RAS/ut_ns_attrib_list.tps'
+@@install_component.sql 'RAS/ut_ras_session_info.tps'
+@@install_component.sql 'RAS/ut_ras_session_hash.tps'
+@@install_component.sql 'RAS/ut_ras_utils.pks'
+@@install_component.sql 'RAS/ut_xs_session_manager.pks'
+
 --core types
 @@install_component.sql 'core/types/ut_run_info.tps'
 @@install_component.sql 'core/types/ut_run_info.tpb'
@@ -323,20 +333,14 @@ prompt Installing DBMSPLSQL Tables objects into &&ut3_owner schema
 @@install_component.sql 'reporters/ut_documentation_reporter.tps'
 @@install_component.sql 'reporters/ut_documentation_reporter.tpb'
 
---RAS object
-@@install_component.sql 'RAS/ut_principal.tps'
+--RAS objects (body)
 @@install_component.sql 'RAS/ut_principal.tpb'
-@@install_component.sql 'RAS/ut_principal_list.tps'
-@@install_component.sql 'RAS/ut_ns_attrib.tps'
 @@install_component.sql 'RAS/ut_ns_attrib.tpb'
-@@install_component.sql 'RAS/ut_ns_attrib_list.tps'
-@@install_component.sql 'RAS/ut_ras_session_info.tps'
-@@install_component.sql 'RAS/ut_ras_session_hash.tps'
 @@install_component.sql 'RAS/ut_ras_session_hash.tpb'
-@@install_component.sql 'RAS/ut_ras_utils.pks'
 @@install_component.sql 'RAS/ut_ras_utils.pkb'
 @@install_component.sql 'RAS/ut_ras.tps'
 @@install_component.sql 'RAS/ut_ras.tpb'
+@@install_component.sql 'RAS/ut_xs_session_manager.pkb'
 
 
 --plugin interface API for running utPLSQL

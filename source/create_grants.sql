@@ -150,5 +150,6 @@ grant execute on &&ut3_owner..ut_ns_attrib_list to &ut3_user;
 grant execute on &&ut3_owner..ut_ns_attrib to &ut3_user;
 grant execute on &&ut3_owner..ut_principal_list to &ut3_user;
 grant execute on &&ut3_owner..ut_principal to &ut3_user;
+grant execute on &&ut3_owner..ut_xs_session_manager to &ut3_user;
 
 
