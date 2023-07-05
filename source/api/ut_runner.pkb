@@ -28,6 +28,10 @@ create or replace package body ut_runner is
     ut_utils.read_cache_to_dbms_output();
     ut_coverage_helper.cleanup_tmp_table();
     ut_compound_data_helper.cleanup_diff();
+
+    -- RAS cleanup
+    ut_xs_session_manager.destroy_all_sessions();
+    
     if not a_force_manual_rollback then
       rollback;
     end if;
