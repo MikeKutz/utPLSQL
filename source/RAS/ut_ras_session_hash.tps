@@ -4,6 +4,6 @@ create or replace type ut_ras_session_hash authid current_user as object (
     member procedure set_user( a_username_uid in varchar2, a_sessionid in raw ),
     member function get_sessionid( a_username_uid in varchar2 ) return raw,
     member function user_exists( a_username_uid in varchar2 ) return boolean,
-    member function get_all_users return varchar2 -- something, pipelined
+    member function get_all_users return ut_principal_list -- something, pipelined
 ) final not persistable;
 /

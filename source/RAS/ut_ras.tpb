@@ -135,8 +135,11 @@ as
   as
     l_users      ut_principal_list := new ut_principal_list();
     l_sessionid  raw(32);
+    
   begin
     self.detach_session;
+
+    l_users := self.ras_sessions.get_all_users();
     
     for i in 1 .. l_users.count
     loop
@@ -160,7 +163,7 @@ as
     if self.ras_sessions.user_exists( a_session_info.principal.to_string() )
     then
       a_session_info.sessionid := self.ras_sessions.get_sessionid( a_session_info.principal.to_string() );
-      dbms_output.put_line( 'RAS SESSION : I ALREADY GOT ONE!!!' );
+
       if a_session_info.sessionid is null
       then
         raise no_session;

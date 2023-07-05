@@ -73,29 +73,33 @@ as
         return false;
     end;
     
-    member function get_all_users return varchar2 -- something, pipelined
+    member function get_all_users return ut_principal_list
     as
-        l_username varchar2(100);
+        l_ret_val   ut_principal_list := new ut_principal_list();
+        
         l_user_list json_key_list;
         l_uid_list  json_key_list;
         l_uid_json  json_object_t;
     begin
         l_user_list := self.ras_info.get_keys;
         
-        for username in 1 .. l_user_list.count
+        for i  in 1 .. l_user_list.count
         loop
-            l_uid_json := self.ras_info.get_object( username );
+            l_uid_json := self.ras_info.get_object( l_user_list(i) );
+            
             l_uid_list := l_uid_json.get_keys;
             
-            for unique_dbh in 1 .. l_uid_list.count
+            for j in 1 .. l_uid_list.count
             loop
-                null;
-                --pipe row ( username || ut_ras_session_utils. gc_separator || unique_dbh )
+              l_ret_val.extend();
+              l_ret_val( l_ret_val.last ) := new ut_principal();
+              l_ret_val( l_ret_val.last ).principal_name    := l_user_list(i);
+              l_ret_val( l_ret_val.last ).unique_identifier :=  l_uid_list( j );
             end loop;
             
         end loop;
         
-        return 'done';
+        return l_ret_val;
     end;
 
 end;
