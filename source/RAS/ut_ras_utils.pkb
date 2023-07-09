@@ -34,10 +34,29 @@ as
   
   procedure detach_session( a_abort in boolean default false)
   as
+    l_expectation_results  ut_expectation_results;
+    l_pos  int;
   begin
     if is_ras_session
     then
+      l_expectation_results := ut_expectation_processor.get_all_expectations;
+
+      dbms_xs_sessions.save_session;
       dbms_xs_sessions.detach_session( a_abort );
+
+      l_pos := l_expectation_results.first;
+      if l_expectation_results is not null
+      then
+        
+--        dbms_output.put_line( 'RAS expectation N="' || ut_expectation_processor.get_all_expectations().count || '"' );
+        
+        while( l_pos is not null )
+        loop
+          ut_expectation_processor.add_expectation_result( l_expectation_results( l_pos ) );
+          
+          l_pos := l_expectation_results.next( l_pos );
+        end loop;
+      end if;
     end if;
   end;
   
