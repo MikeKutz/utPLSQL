@@ -12,19 +12,10 @@ as
     n int := 0;
   begin
     /* method is for debugging */
-    for rec in (
-      select *
+      select count(*) into n
       from v$xs_session_roles a
-    )
-    loop
-      dbms_output.put_line( 'RAS "' || rec.role_name || '"' );
-
-      if rec.role_name in ( upper( 'xs_ut_ext_1' )
-            ,upper( 'xs_ut_ext_2' ), upper( 'xs_ut_ext_3' ) )
-      then
-        n := n + 1;
-      end if;
-    end loop;
+      where a.role_name in ( upper( 'xs_ut_ext_1' )
+            ,upper( 'xs_ut_ext_2' ), upper( 'xs_ut_ext_3' ) );
     
     ut.expect( n ).to_equal( 3 );
   end;
