@@ -17,37 +17,44 @@ create table ut_suite_cache
   nested table before_all_list store as ut_suite_cache_before_all
     ( nested table ras_session.enabled_roles store as ut_ras_session_001
       nested table ras_session.disabled_roles store as ut_ras_session_002
+      nested table ras_session.external_roles store as ut_ras_session_002b
       nested table ras_session.ns_attrib_list store as ut_ras_session_003
     )
   nested table after_all_list store as ut_suite_cache_after_all
     ( nested table ras_session.enabled_roles store as ut_ras_session_004
       nested table ras_session.disabled_roles store as ut_ras_session_005
+      nested table ras_session.external_roles store as ut_ras_session_005b
       nested table ras_session.ns_attrib_list store as ut_ras_session_006
     )
   nested table before_each_list store as ut_suite_cache_before_each
     ( nested table ras_session.enabled_roles store as ut_ras_session_007
       nested table ras_session.disabled_roles store as ut_ras_session_008
+      nested table ras_session.external_roles store as ut_ras_session_008b
       nested table ras_session.ns_attrib_list store as ut_ras_session_009
     )
   nested table after_each_list store as ut_suite_cache_after_each
     ( nested table ras_session.enabled_roles store as ut_ras_session_010
       nested table ras_session.disabled_roles store as ut_ras_session_011
+      nested table ras_session.external_roles store as ut_ras_session_011b
       nested table ras_session.ns_attrib_list store as ut_ras_session_012
     )
   nested table before_test_list store as ut_suite_cache_before_test
     ( nested table ras_session.enabled_roles store as ut_ras_session_013
       nested table ras_session.disabled_roles store as ut_ras_session_014
+      nested table ras_session.external_roles store as ut_ras_session_014b
       nested table ras_session.ns_attrib_list store as ut_ras_session_015
     )
   nested table after_test_list store as ut_suite_cache_after_test
     ( nested table ras_session.enabled_roles store as ut_ras_session_016
       nested table ras_session.disabled_roles store as ut_ras_session_017
+      nested table ras_session.external_roles store as ut_ras_session_017b
       nested table ras_session.ns_attrib_list store as ut_ras_session_018
     )
   nested table expected_error_codes store as ut_suite_cache_throws
   nested table tags store as ut_suite_cache_tags return as locator
       nested table item.ras_session.enabled_roles store as ut_ras_session_item_1
       nested table item.ras_session.disabled_roles store as ut_ras_session_item_2
+      nested table item.ras_session.external_roles store as ut_ras_session_item_2b
       nested table item.ras_session.ns_attrib_list store as ut_ras_session_item_3
 /
 
