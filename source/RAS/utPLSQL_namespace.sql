@@ -15,3 +15,7 @@ begin
     xs_namespace.create_template( ut_session_context.get_namespace, attr_list => l_ns_attrib_vals );
 end;
 /
+
+exec xs_principal.create_dynamic_role( 'xs_ut_role', description => 'utPLSQL dynamic role' );
+exec xs_principal.create_dynamic_role( 'xs_ut_2', description => 'utPLSQL dynamic role' );
+exec xs_principal.create_dynamic_role( 'xs_ut_3', description => 'utPLSQL dynamic role' );

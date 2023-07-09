@@ -27,6 +27,8 @@ as
     end if;
     
     dbms_xs_sessions.attach_session( a_session.sessionid
+                                    ,enable_dynamic_roles => ut_ras_utils.ut_role_to_xs_role( a_session.enabled_roles )
+                                    ,external_roles => ut_ras_utils.ut_role_to_xs_role( a_session.external_roles )
                                     ,namespaces => ut_ras_utils.ut_attrib_to_xs_attrib( a_session.ns_attrib_list ) );
   end;
   
@@ -72,6 +74,21 @@ as
     end loop;
     
     <<return_clause>>
+    return l_return_value;
+  end;
+
+  function ut_role_to_xs_role( a_ut_vals in ut_principal_list ) return xs$name_list
+  as
+    l_return_value  xs$name_list := new xs$name_list();
+  begin
+    if a_ut_vals is null then return null; end if;
+  
+    for i in 1 .. a_ut_vals.count
+    loop
+      l_return_value.extend();
+      l_return_value( l_return_value.last ) := a_ut_vals(i).principal_name;
+    end loop;
+    
     return l_return_value;
   end;
 

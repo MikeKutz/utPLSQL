@@ -104,7 +104,142 @@ create or replace package body ut_suite_builder is
     by_proc     tt_annotations_by_proc,
     by_name     tt_annotations_by_name
   );
+  
+  type t_annotation_params is record (
+        p1 t_annotation_text,
+        p2 t_annotation_text,
+        p3 t_annotation_text,
+        p4 t_annotation_text
+  );
+  
+  type tt_annotation_params is table of t_annotation_params index by t_annotation_position;
+  
+  function parse_first_annotation( a_input in out nocopy tt_annotation_texts ) return t_annotation_params
+  as
+    l_return_value t_annotation_params := new t_annotation_params();
+    l_annot_pos    t_annotation_position;
+    l_all_values   ut_varchar2_list;
+  begin
+    if a_input is null then return l_return_value; end if;
 
+    if a_input.count >= 1 then
+      l_annot_pos := a_input.first;
+      
+      l_all_values := ut_utils.string_to_table(a_input(l_annot_pos), ',');
+      
+
+      if l_all_values.count >= 4 then
+          l_return_value.p4 := l_all_values(4);
+      end if;
+      if l_all_values.count >= 3 then
+          l_return_value.p3 := l_all_values(3);
+      end if;
+      if l_all_values.count >= 2 then
+          l_return_value.p2 := l_all_values(2);
+      end if;
+      if l_all_values.count >= 1 then
+          l_return_value.p1 := l_all_values(1);
+      end if;
+    end if;
+
+    return l_return_value;
+  end;
+  
+  function parse_all_annotations( a_input in out nocopy tt_annotation_texts ) return tt_annotation_params
+  as
+    l_return_value tt_annotation_params; -- AA are already initialized
+    l_annot_pos    t_annotation_position;
+    l_all_values   ut_varchar2_list;
+    i              int := 0;
+  begin
+    l_annot_pos := a_input.first;
+    
+    while( l_annot_pos is not null )
+    loop
+      i := i + 1;
+      l_all_values := ut_utils.string_to_table(a_input(l_annot_pos), ',');
+
+      if l_all_values.count >= 4 then
+          l_return_value(i).p4 := l_all_values(4);
+      end if;
+      if l_all_values.count >= 3 then
+          l_return_value(i).p3 := l_all_values(3);
+      end if;
+      if l_all_values.count >= 2 then
+          l_return_value(i).p2 := l_all_values(2);
+      end if;
+      if l_all_values.count >= 1 then
+          l_return_value(i).p1 := l_all_values(1);
+      end if;
+    
+      l_annot_pos := a_input.next( l_annot_pos );
+    end loop;
+    
+    return l_return_value;
+  end;
+
+  -- parse_as_one
+  function parse_single_values( a_input in out nocopy tt_annotation_texts ) return ut_varchar2_list
+  as
+    l_return_value  ut_varchar2_list := new ut_varchar2_list();
+    l_annot_pos    t_annotation_position;
+    l_all_values   ut_varchar2_list;
+  begin
+    l_annot_pos := a_input.first;
+    
+    while( l_annot_pos is not null )
+    loop
+      l_all_values := ut_utils.string_to_table(a_input(l_annot_pos), ',');
+      
+      for i in 1 .. l_all_values.count
+      loop
+        l_return_value.extend();
+        l_return_value( l_return_value.last ) := upper(trim( l_all_values(i) ));
+      end loop;
+
+      l_annot_pos := a_input.next( l_annot_pos );
+    end loop;
+
+    return l_return_value;
+  end;
+  
+  -- parse_roles
+  function parse_xs_roles( a_input in out nocopy tt_annotation_texts ) return ut_principal_list
+  as
+    l_return_value   ut_principal_list := ut_principal_list();
+    l_parsed_values  ut_varchar2_list;
+  begin
+    l_parsed_values := parse_single_values( a_input );
+    
+    for i in 1 .. l_parsed_values.count
+    loop
+      l_return_value.extend();
+      l_return_value( l_return_value.last ) := new ut_principal( l_parsed_values(i) );
+    end loop;
+
+    return l_return_value;    
+  end;
+
+  function parse_ns_attribs( a_input in out nocopy tt_annotation_texts ) return ut_ns_attrib_list
+  as
+    l_buffer         tt_annotation_params;
+    l_return_value   ut_ns_attrib_list := new ut_ns_attrib_list();
+  begin
+    l_buffer := parse_all_annotations( a_input );
+    
+    for i in 1 .. l_buffer.count
+    loop
+      l_return_value.extend();
+      l_return_value( l_return_value.last ) := new ut_ns_attrib(
+                        trim(l_buffer(i).p1),
+                        trim(l_buffer(i).p2),
+                        trim(l_buffer(i).p3) );
+    end loop;
+    
+    return l_return_value;
+  end;
+
+  
   procedure delete_annotations_range(
     a_annotations in out nocopy t_annotations_info,
     a_start_pos   t_annotation_position,
@@ -433,11 +568,11 @@ create or replace package body ut_suite_builder is
     -- process RAS User tag ( ut_suite_item needs ras_user attribute)
     <<ras_tags>>
     declare
-      l_ras_user_list ut_varchar2_list := new ut_varchar2_list();
       l_ras_principal ut_principal;
-      l_ras_user   varchar2(100);
-      l_ras_pos    pls_integer;
-      l_ras_tt    tt_annotation_texts;
+      l_data          t_annotation_params;
+      l_ns_attribs    ut_ns_attrib_list;
+      l_ext_roles     ut_principal_list;
+      l_roles         ut_principal_list;
     begin
       -- User
       warning_on_duplicate_annot( a_suite, l_proc_annotations, gc_ras_user, a_procedure_name);
@@ -446,17 +581,51 @@ create or replace package body ut_suite_builder is
           ut_varchar2_list( gc_ras_ext_user )
       );
    
-      if l_proc_annotations.exists( gc_ras_user )
+      if l_proc_annotations.exists( gc_ras_user ) or l_proc_annotations.exists( gc_ras_ext_user )
       then
-        l_ras_tt  :=  l_proc_annotations( gc_ras_user );
-        l_ras_pos := l_ras_tt.first;
-        l_ras_user := 'harley';
-        l_ras_user := ut_utils.string_to_table(l_ras_tt(l_ras_pos), ',')(1);
-        l_ras_principal := new ut_principal( l_ras_user );
+        if l_proc_annotations.exists( gc_ras_user )
+        then
+          l_data := parse_first_annotation(l_proc_annotations( gc_ras_user ) );
+          l_ras_principal := new ut_principal( l_data.p1 );
+        else
+          l_data := parse_first_annotation(l_proc_annotations( gc_ras_ext_user ) );
+          l_ras_principal := new ut_principal( l_data.p1 );
+          l_ras_principal.is_external := 1;
+        end if;
 
-        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, null, null, null, null, 0);
+
+        if l_data.p2 is not null
+        then
+          l_ras_principal.unique_identifier := l_data.p2;
+        end if;
+        
+        -- NS Attributes
+        if l_proc_annotations.exists( gc_ras_ns_attrib )
+        then
+          l_ns_attribs := parse_ns_attribs( l_proc_annotations( gc_ras_ns_attrib ) );
+        end if;
+        
+      -- process roles
+        -- disabled roles
+        -- internal roles
+      if l_proc_annotations.exists( gc_ras_role ) 
+      then
+        l_roles := parse_xs_roles( l_proc_annotations( gc_ras_role ) );
+      end if;
+
+        -- external roles
+      if l_proc_annotations.exists( gc_ras_ext_role ) 
+      then
+        l_ext_roles := parse_xs_roles( l_proc_annotations( gc_ras_ext_role ) );
+      end if;
+        
+        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, l_roles, null, l_ext_roles, l_ns_attribs, null, 0);
       end if;
     end;
+    
+    
+    -- if l_proc_annotations.exists( gc_ras_disable ) then
+    --   l_test.item.ras_session.disabled := 1
 
     a_suite_items.extend;
     a_suite_items( a_suite_items.last ) := l_test;

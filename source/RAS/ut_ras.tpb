@@ -128,6 +128,10 @@ as
   member procedure detach_session( a_abort in boolean default false)
   as
   begin
+    if ut_ras_utils.is_ras_session
+    then
+      dbms_xs_sessions.save_session;
+    end if;
     ut_ras_utils.detach_session( a_abort );
   end;
   
