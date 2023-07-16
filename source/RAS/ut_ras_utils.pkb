@@ -21,7 +21,7 @@ as
     if a_session is null then return; end if;
     if a_session.principal.principal_name is null
       or a_session.sessionid is null
-      or a_session.disabled = 1
+      or a_session.disabled = ut_utils.boolean_to_int( true )
     then
       return;
     end if;

@@ -43,7 +43,7 @@ create or replace package body ut_suite_builder is
   gc_ras_ext_user                constant t_annotation_name := 'xsextuser';
   gc_ras_role                    constant t_annotation_name := 'xsrole';
   gc_ras_ext_role                constant t_annotation_name := 'xsextrole';
-  gc_ras_ns_attrib               constant t_annotation_name := 'xsnsattrib';
+  gc_ras_ns_attrib               constant t_annotation_name := 'xsnsattr';
 
   type tt_annotations is table of t_annotation_name;
 
@@ -65,7 +65,8 @@ create or replace package body ut_suite_builder is
       gc_rollback,
       gc_context,
       gc_name,
-      gc_endcontext,
+      gc_endcontext
+  ) multiset union tt_annotations (
       gc_ras_user,
       gc_ras_ext_user,
       gc_ras_role,
@@ -565,7 +566,7 @@ create or replace package body ut_suite_builder is
       l_test.disabled_reason := l_annotation_texts(l_annotation_texts.first);
     end if;
 
-    -- process RAS User tag ( ut_suite_item needs ras_user attribute)
+    -- process RAS User tag
     <<ras_tags>>
     declare
       l_ras_principal ut_principal;
@@ -590,7 +591,7 @@ create or replace package body ut_suite_builder is
         else
           l_data := parse_first_annotation(l_proc_annotations( gc_ras_ext_user ) );
           l_ras_principal := new ut_principal( l_data.p1 );
-          l_ras_principal.is_external := 1;
+          l_ras_principal.is_external := ut_utils.boolean_to_int(true);
         end if;
 
 
@@ -605,21 +606,23 @@ create or replace package body ut_suite_builder is
           l_ns_attribs := parse_ns_attribs( l_proc_annotations( gc_ras_ns_attrib ) );
         end if;
         
-      -- process roles
-        -- disabled roles
-        -- internal roles
-      if l_proc_annotations.exists( gc_ras_role ) 
-      then
-        l_roles := parse_xs_roles( l_proc_annotations( gc_ras_role ) );
-      end if;
-
-        -- external roles
-      if l_proc_annotations.exists( gc_ras_ext_role ) 
-      then
-        l_ext_roles := parse_xs_roles( l_proc_annotations( gc_ras_ext_role ) );
-      end if;
+        -- parse disabled roles
+        /* TODO */
         
-        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, l_roles, null, l_ext_roles, l_ns_attribs, null, 0);
+        -- parse internal roles
+        if l_proc_annotations.exists( gc_ras_role ) 
+        then
+          l_roles := parse_xs_roles( l_proc_annotations( gc_ras_role ) );
+        end if;
+  
+        -- parse external roles
+        if l_proc_annotations.exists( gc_ras_ext_role ) 
+        then
+          l_ext_roles := parse_xs_roles( l_proc_annotations( gc_ras_ext_role ) );
+        end if;
+        
+        -- preserve parsed information
+        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, l_roles, null, l_ext_roles, l_ns_attribs, null,  ut_utils.boolean_to_int(false));
       end if;
     end;
     

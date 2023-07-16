@@ -121,7 +121,7 @@ as
     l_principal_user ut_principal;
   begin
     l_principal_user := new ut_principal( a_username);
-    l_principal_user.is_external := 1;
+    l_principal_user.is_external := ut_utils.boolean_to_int( true );
     self.attach_session( l_principal_user );
   end;
 

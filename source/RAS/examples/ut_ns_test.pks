@@ -16,8 +16,8 @@ as
 
   --%test( XS Context Set )
   --%xsuser( daustin )
-  --%xsnsattrib( ut_test_ns, attr1, hello world )
-  --%xsnsattrib( ut_test_ns, attr2, this is the way )
+  --%xsnsattr( ut_test_ns, attr1, hello world )
+  --%xsnsattr( ut_test_ns, attr2, this is the way )
   procedure context_test2;
   
   --%test( Stateless Test )
@@ -26,8 +26,8 @@ as
   
   --%test( Overwrite NS Attributes )
   --%xsuser( daustin )
-  --%xsnsattrib( ut_test_ns, attr1, marco )
-  --%xsnsattrib( ut_test_ns, attr2, polo )
+  --%xsnsattr( ut_test_ns, attr1, marco )
+  --%xsnsattr( ut_test_ns, attr2, polo )
   procedure context_overwrite;
 
   --%test( Statelessness of Overwrite )
@@ -36,8 +36,8 @@ as
 
   --%test( Test for XS NS Case Sensitive bug )
   --%xsuser( daustin )
-  --%xsnsattrib( ut_test_ns, attr1, marco )
-  --%xsnsattrib( ut_test_ns, attr2, polo )
+  --%xsnsattr( ut_test_ns, attr1, marco )
+  --%xsnsattr( ut_test_ns, attr2, polo )
   procedure xs_ns_bug;
   
   
