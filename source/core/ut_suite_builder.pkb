@@ -44,6 +44,7 @@ create or replace package body ut_suite_builder is
   gc_ras_role                    constant t_annotation_name := 'xsrole';
   gc_ras_ext_role                constant t_annotation_name := 'xsextrole';
   gc_ras_ns_attrib               constant t_annotation_name := 'xsnsattr';
+  gc_ras_disable_roles           constant t_annotation_name := 'xsdisableroles';
 
   type tt_annotations is table of t_annotation_name;
 
@@ -71,7 +72,8 @@ create or replace package body ut_suite_builder is
       gc_ras_ext_user,
       gc_ras_role,
       gc_ras_ext_role,
-      gc_ras_ns_attrib
+      gc_ras_ns_attrib,
+      gc_ras_disable_roles
   );
 
   type tt_executables is table of ut_executables index by t_annotation_position;
@@ -574,6 +576,7 @@ create or replace package body ut_suite_builder is
       l_ns_attribs    ut_ns_attrib_list;
       l_ext_roles     ut_principal_list;
       l_roles         ut_principal_list;
+      l_disable_roles ut_principal_list;
     begin
       -- User
       warning_on_duplicate_annot( a_suite, l_proc_annotations, gc_ras_user, a_procedure_name);
@@ -607,7 +610,10 @@ create or replace package body ut_suite_builder is
         end if;
         
         -- parse disabled roles
-        /* TODO */
+        if l_proc_annotations.exists( gc_ras_disable_roles ) 
+        then
+          l_disable_roles := parse_xs_roles( l_proc_annotations( gc_ras_disable_roles ) );
+        end if;
         
         -- parse internal roles
         if l_proc_annotations.exists( gc_ras_role ) 
@@ -620,16 +626,24 @@ create or replace package body ut_suite_builder is
         then
           l_ext_roles := parse_xs_roles( l_proc_annotations( gc_ras_ext_role ) );
         end if;
-        
+
         -- preserve parsed information
-        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal, l_roles, null, l_ext_roles, l_ns_attribs, null,  ut_utils.boolean_to_int(false));
+        l_test.item.ras_session := new ut_ras_session_info( l_ras_principal,
+                                                            l_roles,
+                                                            l_disable_roles,
+                                                            l_ext_roles,
+                                                            l_ns_attribs,
+                                                            null, -- session id
+                                                            ut_utils.boolean_to_int(false));
+
+        -- if l_proc_annotations.exists( gc_ras_disable ) then
+        --   l_test.item.ras_session.disabled := ut_utils.boolean_to_int(true);
+        -- else
+        --   l_test.item.ras_session.disabled := ut_utils.boolean_to_int(false);
+        -- end if;
       end if;
     end;
     
-    
-    -- if l_proc_annotations.exists( gc_ras_disable ) then
-    --   l_test.item.ras_session.disabled := 1
-
     a_suite_items.extend;
     a_suite_items( a_suite_items.last ) := l_test;
 

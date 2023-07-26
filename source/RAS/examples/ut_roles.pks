@@ -22,6 +22,14 @@ as
   --%xsuser( daustin )
   procedure role_call_stateless;
   
+  --%test( Disable Roles )
+  --%xsuser( daustin )
+  --%xsdisableroles( xs_ut_2 )
+  procedure role_call_minus;
+  
+  --%test( Disable Roles )
+  --%xsuser( daustin )
+  procedure role_call_minus_stateless;
 end;
 /
 

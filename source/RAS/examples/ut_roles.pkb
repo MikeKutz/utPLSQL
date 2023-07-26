@@ -31,5 +31,23 @@ as
     role_call2;
   end;
 
+  procedure role_call_minus
+  as
+    n int;
+  begin
+    select count(*) into n
+    from v$xs_session_roles a
+    where a.role_name in ( upper( 'xs_ut_role' )
+          ,upper( 'xs_ut_3' ) );
+    
+    ut.expect( n ).to_equal( 2 );
+  end;
+
+  procedure role_call_minus_stateless
+  as
+  begin
+    role_call_minus;
+  end;
+
 end;
 /
