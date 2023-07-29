@@ -43,14 +43,5 @@ create or replace package ut_session_context as
   
   /* list of all attributes used */
   function list_attributes return ut_varchar2_list;
-  
-  /*
-   * Returns true if current DB Session is attached to a RAS session
-   */
---  function is_RAS_session return boolean;
-   
-
---  function context_to_namespace return ut_ns_attrib_list;
-
 end;
 /

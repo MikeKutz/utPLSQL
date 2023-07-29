@@ -35,7 +35,17 @@ create or replace package body ut_session_context as
   function is_ut_run return boolean is
     l_paths    varchar2(32767);
   begin
-    l_paths := sys_context(gc_context_name, 'RUN_PATHS');
+      -- SYS_CONTEXT is cleared when entering a RAS Session
+      -- use XS_SYS_CONTEXT instead.
+    if ut_ras_utils.is_ras_session
+    then
+      select xs_sys_context( gc_context_name, 'RUN_PATHS')
+        into l_paths
+      from dual;
+    else
+      l_paths := sys_context(gc_context_name, 'RUN_PATHS');
+    end if;
+    
     return l_paths is not null;
   end;
 
