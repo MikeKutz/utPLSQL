@@ -20,6 +20,11 @@ create or replace package ut_session_context as
   * Sets value of a context
   */
   procedure set_context(a_name varchar2, a_value varchar2);
+  
+  /*
+  * Gets value of a context or namespace
+  */
+  function get_context(a_name varchar2) return varchar2;
 
   /*
   * Clears value of a context

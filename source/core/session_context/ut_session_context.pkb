@@ -35,16 +35,7 @@ create or replace package body ut_session_context as
   function is_ut_run return boolean is
     l_paths    varchar2(32767);
   begin
-      -- SYS_CONTEXT is cleared when entering a RAS Session
-      -- use XS_SYS_CONTEXT instead.
-    if ut_ras_utils.is_ras_session
-    then
-      select xs_sys_context( gc_context_name, 'RUN_PATHS')
-        into l_paths
-      from dual;
-    else
-      l_paths := sys_context(gc_context_name, 'RUN_PATHS');
-    end if;
+    l_paths := get_context('RUN_PATHS');
     
     return l_paths is not null;
   end;
@@ -54,6 +45,28 @@ create or replace package body ut_session_context as
     return gc_context_name;
   end;
 
+  function get_context(a_name in varchar2) return varchar2
+  as
+    l_value  varchar2(32767);
+  begin
+    if a_name is null
+    then
+      return null;
+    end if;
+
+    -- SYS_CONTEXT is cleared when entering a RAS Session
+    -- use XS_SYS_CONTEXT instead.
+    if ut_ras_utils.is_ras_session
+    then
+      select xs_sys_context( gc_context_name, a_name)
+        into l_value
+      from dual;
+    else
+      l_value := sys_context(gc_context_name, a_name);
+    end if;
+  
+    return l_value;
+  end;
 
   function list_attributes return ut_varchar2_list
   as
